@@ -38,18 +38,21 @@ const userSchema = new Schema(
 );
 
 userSchema
-  .virtual("password")
+  .virtual("password") //thuoc tinh ao this.password = this._password nhu vay khong luu vao db
   .set(async function (password) {
-    console.log(password);
-    this._password = password;
-    this.salt = uuidv1();
+    this._password = password; // tao moi thuoc tinh object
+    this.salt = uuidv1(); // gan gia tri cho thuoc tinh khung
     this.hashed_password = await this.encryptPassword(password);
   })
   .get(function () {
-    return this._password;
+    console.log(this._password);
+    return this._password; // tra ve gia tri cho thuoc tinh ao "password"
   });
 
 userSchema.methods = {
+  authenticate: function (plainText) {
+    return this.encryptPassword(plainText) === this.hashed_password;
+  },
   encryptPassword: function (password) {
     try {
       const hash = crypto
