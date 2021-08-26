@@ -4,19 +4,15 @@ require("dotenv").config();
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+
 //import router
+const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 
 //app
 const app = express();
-//db
 
-// mongoose
-//   .connect(process.env.DATABASE, {
-//     useNewUrlParser: true,
-//     useCreateIndex: true,
-//   })
-//   .then(console.log("connected db"));
+// db
 (async () => {
   try {
     await mongoose.connect(process.env.DATABASE, {
@@ -39,8 +35,8 @@ app.use(
 );
 app.use(cookieParser());
 
-
 // routes middleware
+app.use("/api", authRouter);
 app.use("/api", userRouter);
 
 const port = process.env.PORT;

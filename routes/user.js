@@ -1,13 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { hello, signup, signin, signout } = require("../controllers/user");
-const {
-  validateRequestSchema,
-} = require("../middleware/validate-request-schema");
-const { schema } = require("../schema/register-schema");
-router.get("/hello", hello);
-router.post("/signup", schema, validateRequestSchema, signup);
-router.post("/signin", signin);
-router.get("/signout", signout);
+const { requireSignin, isAdmin, isAuth } = require("../controllers/auth");
+const { userById } = require("../controllers/user");
+
+router.get("/secret/:userId", requireSignin, isAuth, isAdmin, (req, res) => {
+  res.json({ user: req.profile });
+});
+
+router.param("userId", userById);
 
 module.exports = router;
