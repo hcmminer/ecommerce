@@ -57,16 +57,14 @@ exports.signout = (req, res) => {
 exports.requireSignin = expressJwt({
   secret: process.env.JWT_SECRET,
   algorithms: ["sha1", "RS256", "HS256"], // added later
-  userProperty: "auth",// *
+  userProperty: "auth", // *
 });
 
 // kiem tra xem nguoi login va nguoi gui yeu cau la mot khong
 exports.isAuth = (req, res, next) => {
   // req.profile chinh la document cua id chua trong url gui len "/secret/:userId" GET method
-  // req.auth la thuoc tinh duoc tao ra boi * tren 
+  // req.auth la thuoc tinh duoc tao ra boi * tren
   let user = req.profile && req.auth && req.profile._id == req.auth._id;
-  console.log("🚀 ~ file: auth.js ~ line 66 ~ req.auth", req.auth);
-  console.log("🚀 ~ file: auth.js ~ line 66 ~ req.profile", req.profile);
 
   if (!user) {
     return res.status(403).json({ error: "acess denied" });
@@ -76,7 +74,6 @@ exports.isAuth = (req, res, next) => {
 
 exports.isAdmin = (req, res, next) => {
   if (req.profile.role === 0) {
-    console.log("🚀 ~ file: auth.js ~ line 78 ~ req.profile", req.profile);
     return res.status(403).json({ error: "Admin resource, access denied" });
   }
   next();
