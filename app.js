@@ -48,5 +48,5 @@ app.use("/api", productRouter);
 const port = process.env.PORT;
 
 app.listen(port, () => {
-  console.log(`APP RUNNING - http://localhost:${port}`);
+  console.log(`Back End running at - http://localhost:${port}`);
 });
