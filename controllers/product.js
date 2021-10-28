@@ -102,13 +102,15 @@ exports.update = (req, res) => {
 };
 
 exports.productById = (req, res, next, id) => {
-  Product.findById(id).exec((err, product) => {
-    if (err || !product) {
-      return res.status(400).json({ error: "Product not found" });
-    }
-    req.product = product;
-    next();
-  });
+  Product.findById(id)
+    .populate("category") // them cai nay xem duoc danh muc ma san pham tham chieu den
+    .exec((err, product) => {
+      if (err || !product) {
+        return res.status(400).json({ error: "Product not found" });
+      }
+      req.product = product;
+      next();
+    });
 };
 
 exports.read = (req, res) => {
@@ -234,4 +236,27 @@ exports.photo = (req, res, next) => {
   }
 
   next();
+};
+
+exports.listSearch = (req, res) => {
+  // create query object to hold search value and category values
+  const query = {};
+  // assign search value to query.name
+  if (req.query.search) {
+    query.name = { $regex: req.query.search, $options: "i" }; // thieu dau 's' ma no cay
+    //assign category value to query.category
+    if (req.query.category && req.query.category != "All") {
+      query.category = req.query.category;
+    }
+    // find the product based on query object with 2 properties
+    // serch and category
+    Product.find(query, (err, products) => {
+      if (err) {
+        return res.status(400).json({
+          error: errorHandler(err),
+        });
+      }
+      res.json(products);
+    }).select("-photo");
+  }
 };

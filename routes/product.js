@@ -11,7 +11,8 @@ const {
   listRelated,
   listCategories,
   listBySearch,
-  photo
+  photo,
+  listSearch,
 } = require("../controllers/product");
 const { requireSignin, isAdmin, isAuth } = require("../controllers/auth");
 const { userById } = require("../controllers/user");
@@ -42,11 +43,11 @@ router.put(
 
 router.get("/product/:productById", read);
 router.get("/products", list);
+router.get("/products/search", listSearch);
 router.get("/products/related/:productById", listRelated);
 router.get("/products/categories", listCategories);
 router.post("/products/by/search", listBySearch);
 router.get("/product/photo/:productById", photo);
-
 
 router.param("userById", userById);
 router.param("productById", productById);
