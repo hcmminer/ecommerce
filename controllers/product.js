@@ -60,24 +60,20 @@ exports.update = (req, res) => {
     }
 
     // check for all fields
-    const { name, description, price, category, quantity, shipping } = fields;
-    if (
-      !name ||
-      !description ||
-      !price ||
-      !category ||
-      !quantity ||
-      !shipping
-    ) {
-      return res.status(400).json({
-        error: "all fields are required",
-      });
-    }
+    // const { name, description, price, category, quantity, shipping } = fields;
+    // if (
+    //   !name ||
+    //   !description ||
+    //   !price ||
+    //   !category ||
+    //   !quantity ||
+    //   !shipping
+    // ) {
+    //   return res.status(400).json({
+    //     error: "all fields are required",
+    //   });
+    // }
     let product = req.product;
-    console.log(
-      "🚀 ~ file: product.js ~ line 82 ~ form.parse ~ product",
-      product
-    );
 
     product = lodash.extend(product, fields);
 
@@ -139,7 +135,7 @@ exports.remove = (req, res) => {
 exports.list = (req, res) => {
   let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
   let order = req.query.order ? req.query.order : "asc";
-  let limit = req.query.limit ? parseInt(req.query.limit) : 6;
+  let limit = req.query.limit ? parseInt(req.query.limit) : 10;
 
   Product.find({})
     .select("-photo") // khong mang theo photo vao documents
@@ -163,7 +159,7 @@ exports.list = (req, res) => {
  */
 
 exports.listRelated = (req, res) => {
-  let limit = req.query.limit ? parseInt(req.query.limit) : 6;
+  let limit = req.query.limit ? parseInt(req.query.limit) : 10;
   Product.find({ _id: { $ne: req.product }, category: req.product.category })
     .limit(limit)
     .populate("category", "_id name")
@@ -259,4 +255,24 @@ exports.listSearch = (req, res) => {
       res.json(products);
     }).select("-photo");
   }
+};
+
+exports.decreaseQuantity = (req, res, next) => {
+  let bulkOps = req.body.order.products.map((item) => {
+    return {
+      updateOne: {
+        filter: { _id: item._id },
+        update: { $inc: { quantity: -item.count, sold: +item.count } },
+      },
+    };
+  });
+
+  Product.bulkWrite(bulkOps, {}, (error, products) => {
+    if (error) {
+      return res.status(400).json({
+        error: "Could not update product",
+      });
+    }
+    next();
+  });
 };
