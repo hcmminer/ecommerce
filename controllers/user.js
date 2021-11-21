@@ -120,6 +120,3 @@ exports.purchaseHistory = (req, res) => {
       res.json(orders);
     });
 };
-
-
-
